@@ -109,6 +109,41 @@ M.credo = h.make_builtin({
     factory = h.generator_factory,
 })
 
+M.golangcilint = h.make_builtin({
+    method = methods.internal.SAVE_DIAGNOSTICS,
+    filetypes = { "go" },
+    generator_opts = {
+        command = "golangci-lint",
+        timeout = 10000,
+        to_stdin = false,
+        from_stderr = true,
+        args = {
+            "run",
+            "--no-config",
+            "--disable-all",
+            "--enable",
+            "wsl",
+            "--out-format",
+            "json",
+            "$FILENAME",
+        },
+        format = "json",
+        on_output = function(params)
+            local issues = {}
+            for _, issue in ipairs(params.output.Issues) do
+                table.insert(issues, {
+                    row = issue.Pos.Line,
+                    col = issue.Pos.Column,
+                    message = issue.Text,
+                    source = "golangci-lint",
+                })
+            end
+            return issues
+        end,
+    },
+    factory = h.generator_factory,
+})
+
 M.luacheck = h.make_builtin({
     method = DIAGNOSTICS,
     filetypes = { "lua" },
