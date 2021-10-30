@@ -96,7 +96,7 @@ M.handler = function(method, original_params, handler)
         local bufnr = vim.uri_to_bufnr(original_params.textDocument.uri)
         require("null-ls.generators").run_registered_sequentially({
             filetype = api.nvim_buf_get_option(bufnr, "filetype"),
-            method = methods.map[method],
+            methods = methods.map[method],
             make_params = function()
                 return u.make_params(original_params, methods.map[method])
             end,

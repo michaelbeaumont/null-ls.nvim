@@ -53,6 +53,7 @@ function M.on_register_source(source_methods)
 
     local client = u.get_client()
     local is_diagnostic_source = vim.tbl_contains(source_methods, methods.internal.DIAGNOSTICS)
+    local is_save_diagnostic_source = vim.tbl_contains(source_methods, methods.internal.SAVE_DIAGNOSTICS)
     local handle_existing_buffer = function(buf)
         if buf.name == "" then
             return
@@ -61,6 +62,9 @@ function M.on_register_source(source_methods)
         M.try_add(buf.bufnr)
         if client and is_diagnostic_source then
             client.notify(methods.lsp.DID_CHANGE, { textDocument = { uri = vim.uri_from_bufnr(buf.bufnr) } })
+        end
+        if client and is_save_diagnostic_source then
+            client.notify(methods.lsp.DID_SAVE, { textDocument = { uri = vim.uri_from_bufnr(buf.bufnr) } })
         end
     end
 

@@ -11,6 +11,7 @@ local capabilities = {
     textDocumentSync = {
         change = 1, -- prompt LSP client to send full document text on didOpen and didChange
         openClose = true,
+        save = true,
     },
 }
 

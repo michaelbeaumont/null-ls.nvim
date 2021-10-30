@@ -46,7 +46,7 @@ M.handler = function(original_params)
         return
     end
 
-    if method == methods.lsp.DID_CHANGE then
+    if method == methods.lsp.DID_CHANGE or method == methods.lsp.DID_SAVE then
         s.clear_cache(uri)
     end
 
@@ -54,7 +54,7 @@ M.handler = function(original_params)
     local handler = u.resolve_handler(methods.lsp.PUBLISH_DIAGNOSTICS)
     require("null-ls.generators").run_registered({
         filetype = params.ft,
-        method = methods.map[method],
+        methods = methods.map[method],
         params = params,
         postprocess = postprocess,
         callback = function(diagnostics)

@@ -7,7 +7,7 @@ M.run = function(generators, params, postprocess, callback)
     local a = require("plenary.async")
 
     local runner = function()
-        u.debug_log("running generators for method " .. params.method)
+        u.debug_log("running generators for methods " .. table.concat(params.methods, ","))
 
         if vim.tbl_isempty(generators) then
             u.debug_log("no generators available")
@@ -83,29 +83,35 @@ M.run_sequentially = function(generators, make_params, postprocess, callback, af
 end
 
 M.run_registered = function(opts)
-    local filetype, method, params, postprocess, callback =
-        opts.filetype, opts.method, opts.params, opts.postprocess, opts.callback
-    local generators = M.get_available(filetype, method)
+    local filetype, methods, params, postprocess, callback =
+        opts.filetype, opts.methods, opts.params, opts.postprocess, opts.callback
+    local generators = M.get_available(filetype, methods)
 
     M.run(generators, params, postprocess, callback)
 end
 
 M.run_registered_sequentially = function(opts)
-    local filetype, method, make_params, postprocess, callback, after_all =
-        opts.filetype, opts.method, opts.make_params, opts.postprocess, opts.callback, opts.after_all
-    local generators = M.get_available(filetype, method)
+    local filetype, methods, make_params, postprocess, callback, after_all =
+        opts.filetype, opts.methods, opts.make_params, opts.postprocess, opts.callback, opts.after_all
+    local generators = M.get_available(filetype, methods)
 
     M.run_sequentially(generators, make_params, postprocess, callback, after_all)
 end
 
-M.get_available = function(filetype, method)
+M.get_available = function(filetype, methods)
+    local generators = {}
+    for _, method in ipairs(methods) do
+        for _, generator in ipairs(c.get()._generators[method] or {}) do
+            table.insert(generators, generator)
+        end
+    end
     return vim.tbl_filter(function(generator)
         return not generator._failed and u.filetype_matches(generator.filetypes, filetype)
-    end, c.get()._generators[method] or {})
+    end, generators)
 end
 
-M.can_run = function(filetype, method)
-    return not vim.tbl_isempty(M.get_available(filetype, method))
+M.can_run = function(filetype, methods)
+    return not vim.tbl_isempty(M.get_available(filetype, methods))
 end
 
 return M

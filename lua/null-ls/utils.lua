@@ -98,7 +98,7 @@ M.range = {
     end,
 }
 
-M.make_params = function(original_params, method)
+M.make_params = function(original_params, methods)
     local bufnr = resolve_bufnr(original_params)
     local content = resolve_content(original_params, bufnr)
     local pos = api.nvim_win_get_cursor(0)
@@ -107,7 +107,7 @@ M.make_params = function(original_params, method)
         client_id = original_params.client_id,
         lsp_method = original_params.method,
         content = content,
-        method = method,
+        methods = methods,
         row = pos[1],
         col = pos[2],
         bufnr = bufnr,
